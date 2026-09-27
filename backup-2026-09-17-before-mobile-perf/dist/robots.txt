@@ -1,0 +1,6 @@
+# All crawlers — including AI assistants and agents — are welcome.
+# A structured, machine-readable summary of this site is available at /llms.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://ahia-aylon.netlify.app/sitemap.xml
