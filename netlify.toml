@@ -1,0 +1,4 @@
+# Static site: dist/ is committed prebuilt (CSS/JS are built locally from source/ via build.cmd).
+[build]
+  publish = "dist"
+  command = ""
