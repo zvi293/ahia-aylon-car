@@ -84,6 +84,9 @@ const frames = (page, n = 3) => page.evaluate((n) => new Promise((r) => { let i 
     await to(page, Math.round(trackTop + 3 * (cardH + gap) - 114));
     const tops = await page.$$eval(".journey-card", (cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
     check("mobile: all 4 cards stacked at 84/94/104/114", JSON.stringify(tops) === "[84,94,104,114]", JSON.stringify(tops));
+    // Let the copy/chip entrance (0.15s delay + 0.45s fade) finish — the page is long
+    // enough now that this jump can be the first time the cards are revealed
+    await sleep(700);
     const styles = await page.$$eval(".journey-card", (cs) => cs.map((c) => { const s = getComputedStyle(c); return [s.position, s.opacity, getComputedStyle(c.querySelector(".journey-card-copy")).opacity, getComputedStyle(c.querySelector(".journey-card-top")).opacity].join(","); }));
     check("mobile: cards sticky, opaque, copy + chips visible", styles.every((s) => s === "sticky,1,1,1"), styles.join(" | "));
     const depth = await page.$$eval(".journey-card", (cs) => cs.map((c) => getComputedStyle(c).scale + "/" + (+getComputedStyle(c, "::after").opacity).toFixed(2)));
@@ -142,7 +145,7 @@ const frames = (page, n = 3) => page.evaluate((n) => new Promise((r) => { let i 
     const sums = await page.$$(".faq-list summary");
     await sums[0].click(); await sleep(150); await sums[1].click(); await sleep(150);
     const openStates = await page.$$eval(".faq-list details", (d) => d.map((x) => x.open));
-    check("faq: only one answer open at a time", JSON.stringify(openStates) === "[false,true,false,false]", JSON.stringify(openStates));
+    check("faq: only one answer open at a time", openStates.length >= 4 && openStates.filter(Boolean).length === 1 && openStates[1], JSON.stringify(openStates));
 
     await page.evaluate(() => { window.__fetchCalls = []; window.fetch = (url, init) => { window.__fetchCalls.push(String(url)); return Promise.resolve(new Response(JSON.stringify({ success: "true" }), { status: 200, headers: { "Content-Type": "application/json" } })); }; });
     await page.$eval(".form-submit", (b) => b.scrollIntoView({ block: "center" }));
@@ -214,7 +217,7 @@ const frames = (page, n = 3) => page.evaluate((n) => new Promise((r) => { let i 
   }
 
   // ---------------------------------------------------------------- legal pages
-  for (const p of ["privacy.html", "accessibility.html", "404.html"]) {
+  for (const p of ["privacy.html", "accessibility.html", "used-car-buying-guide.html", "car-inspection-before-buying.html", "leasing-car-buying.html", "404.html"]) {
     const { page, ctx, errors } = await open(p, MOBILE);
     const hasHeader = await page.$("[data-header]");
     if (hasHeader && p !== "404.html") {

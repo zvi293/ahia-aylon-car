@@ -179,6 +179,175 @@
     sections.forEach((section) => sectionObserver.observe(section));
   }
 
+  // Sources hotspot: auto-advancing showcase. The active tab's progress bar is
+  // the timer — its animationend moves to the next slide — so every pause
+  // (reading the text, keyboard focus, off-screen, the pause button) is just
+  // animation-play-state on the bar, and the bar and slide can never drift.
+  const hotspot = document.querySelector("[data-hotspot]");
+  if (hotspot) {
+    const tabs = [...hotspot.querySelectorAll('[role="tab"]')];
+    const panes = [...hotspot.querySelectorAll('[role="tabpanel"]')];
+    const pins = [...hotspot.querySelectorAll("[data-hotspot-pin]")];
+    const counter = hotspot.querySelector("[data-hotspot-count]");
+    const toggle = hotspot.querySelector(".hotspot-toggle");
+    const pauseReasons = new Set();
+    let current = 0;
+
+    const syncPaused = () => hotspot.classList.toggle("is-paused", pauseReasons.size > 0);
+    const pause = (reason) => {
+      pauseReasons.add(reason);
+      syncPaused();
+    };
+    const resume = (reason) => {
+      pauseReasons.delete(reason);
+      syncPaused();
+    };
+
+    const activate = (index, moveFocus = false) => {
+      current = (index + tabs.length) % tabs.length;
+      tabs.forEach((tab, i) => {
+        const isActive = i === current;
+        tab.classList.toggle("is-active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+      });
+      panes.forEach((pane, i) => pane.classList.toggle("is-active", i === current));
+      pins.forEach((pin, i) => pin.classList.toggle("is-active", i === current));
+      if (counter) counter.textContent = String(current + 1).padStart(2, "0");
+
+      // Restart the bar even when the same tab is chosen again
+      const bar = tabs[current].querySelector(".hotspot-bar span");
+      if (bar) {
+        bar.style.animation = "none";
+        void bar.offsetWidth;
+        bar.style.animation = "";
+      }
+      if (moveFocus) tabs[current].focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => activate(i));
+      tab.addEventListener("animationend", (event) => {
+        if (!reduceMotion && event.animationName === "hotspotProgress" && i === current) activate(i + 1);
+      });
+    });
+    pins.forEach((pin, i) => pin.addEventListener("click", () => activate(i)));
+
+    // Tabs read right-to-left: ArrowLeft/ArrowDown go forward
+    hotspot.querySelector('[role="tablist"]')?.addEventListener("keydown", (event) => {
+      const step = { ArrowLeft: 1, ArrowDown: 1, ArrowRight: -1, ArrowUp: -1 }[event.key];
+      if (step) {
+        event.preventDefault();
+        activate(current + step, true);
+      } else if (event.key === "Home" || event.key === "End") {
+        event.preventDefault();
+        activate(event.key === "Home" ? 0 : tabs.length - 1, true);
+      }
+    });
+
+    // Hold the slide while the text is being read (mouse) or navigated by keyboard
+    const reading = hotspot.querySelector(".hotspot-panes");
+    reading?.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse") pause("hover");
+    });
+    reading?.addEventListener("pointerleave", () => resume("hover"));
+    const isKeyboardFocus = (element) => {
+      try {
+        return element.matches(":focus-visible");
+      } catch {
+        return false;
+      }
+    };
+    hotspot.addEventListener("focusin", (event) => {
+      if (event.target !== toggle && isKeyboardFocus(event.target)) pause("focus");
+    });
+    hotspot.addEventListener("focusout", (event) => {
+      if (!hotspot.contains(event.relatedTarget)) resume("focus");
+    });
+
+    toggle?.addEventListener("click", () => {
+      const userPaused = !pauseReasons.has("user");
+      if (userPaused) {
+        pause("user");
+      } else {
+        resume("user");
+        resume("focus");
+      }
+      hotspot.classList.toggle("is-user-paused", userPaused);
+      toggle.setAttribute("aria-pressed", String(userPaused));
+      toggle.setAttribute("aria-label", userPaused ? "הפעלת ההחלפה האוטומטית" : "השהיית ההחלפה האוטומטית");
+    });
+
+    // Only run while on screen, so visitors always meet it from the first slide on
+    if ("IntersectionObserver" in window) {
+      pause("offscreen");
+      new IntersectionObserver(([entry]) => (entry.isIntersecting ? resume("offscreen") : pause("offscreen")), {
+        threshold: 0.35,
+      }).observe(hotspot);
+    }
+  }
+
+  // Guide pages: interactive checklists. Ticks are a per-device convenience, so
+  // storage failures (private mode, blocked site data) just mean no memory.
+  document.querySelectorAll("[data-checklist]").forEach((list) => {
+    const boxes = [...list.querySelectorAll('input[type="checkbox"]')];
+    const done = list.querySelector("[data-checklist-done]");
+    const bar = list.querySelector(".guide-checklist-bar");
+    const message = list.querySelector(".guide-checklist-done");
+    const key = "ahia-checklist:" + list.dataset.checklist;
+
+    const save = () => {
+      try {
+        localStorage.setItem(key, JSON.stringify(boxes.map((box) => box.checked)));
+      } catch {
+        // storage unavailable — the list still works for this visit
+      }
+    };
+    const render = () => {
+      const count = boxes.filter((box) => box.checked).length;
+      if (done) done.textContent = count;
+      bar?.style.setProperty("--done", String(count / boxes.length));
+      const complete = count === boxes.length;
+      list.classList.toggle("is-complete", complete);
+      if (message) message.textContent = complete ? "כל הנקודות סומנו — כל הכבוד." : "";
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || "[]");
+      boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    } catch {
+      // ignore unreadable state
+    }
+    boxes.forEach((box) =>
+      box.addEventListener("change", () => {
+        save();
+        render();
+      })
+    );
+    list.querySelector("[data-checklist-reset]")?.addEventListener("click", () => {
+      boxes.forEach((box) => (box.checked = false));
+      save();
+      render();
+    });
+    render();
+  });
+
+  // Guide pages: highlight the table-of-contents entry for the section being read
+  const tocLinks = [...document.querySelectorAll(".guide-toc a[href^='#']")];
+  if (tocLinks.length && "IntersectionObserver" in window) {
+    const byId = new Map(tocLinks.map((link) => [link.getAttribute("href").slice(1), link]));
+    const headings = [...byId.keys()].map((id) => document.getElementById(id)).filter(Boolean);
+    const tocObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries.filter((item) => item.isIntersecting).pop();
+        if (!entry) return;
+        tocLinks.forEach((link) => link.classList.toggle("is-active", link === byId.get(entry.target.id)));
+      },
+      { rootMargin: "-15% 0px -70% 0px" }
+    );
+    headings.forEach((heading) => tocObserver.observe(heading));
+  }
+
   const faqItems = [...document.querySelectorAll(".faq-list details")];
   faqItems.forEach((item) => {
     item.addEventListener("toggle", () => {
