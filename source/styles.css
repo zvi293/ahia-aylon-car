@@ -26,7 +26,7 @@
   --white: #fffdf8;
   --copper: #d48a4a;
   --copper-light: #f2b873;
-  --copper-deep: #a95a28;
+  --copper-deep: #9a5021;
   --green: #25d366;
   --line-dark: rgba(255, 255, 255, 0.13);
   --line-light: rgba(8, 8, 8, 0.14);
@@ -1186,6 +1186,7 @@ svg {
 .lead-form input:focus,
 .lead-form textarea:focus {
   border-color: var(--copper-light);
+  box-shadow: 0 2px 0 var(--copper-light);
 }
 
 .lead-form label.has-error input,
@@ -2783,11 +2784,30 @@ body.modal-open .pulse-dot::after {
   }
 
   .journey-strip {
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 9px 13px;
     margin-top: 18px;
     padding-inline: 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    white-space: normal;
+  }
+
+  .journey-strip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  .journey-strip span::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--copper);
+  }
+
+  .journey-strip i {
+    display: none;
   }
 
   .manifesto {
@@ -3445,7 +3465,7 @@ h1.eyebrow {
 .compare-table thead th {
   padding-top: 24px;
   padding-bottom: 20px;
-  color: rgba(8, 8, 8, 0.56);
+  color: rgba(8, 8, 8, 0.6);
   font-size: 0.84rem;
   font-weight: 750;
   letter-spacing: 0.03em;
@@ -3497,7 +3517,7 @@ h1.eyebrow {
 }
 
 .compare-table .is-no {
-  color: rgba(8, 8, 8, 0.42);
+  color: rgba(8, 8, 8, 0.58);
 }
 
 .compare-price-row th,
@@ -3812,7 +3832,7 @@ h1.eyebrow {
 }
 
 .hotspot-tab b {
-  color: rgba(242, 184, 115, 0.55);
+  color: rgba(242, 184, 115, 0.72);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -5158,7 +5178,7 @@ h1.eyebrow {
 }
 
 .guide-checklist-count {
-  color: rgba(8, 8, 8, 0.5);
+  color: rgba(8, 8, 8, 0.6);
   font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
   direction: ltr;

@@ -76,6 +76,7 @@
           "logo": "https://ahia-cars.co.il/assets/ahia-aylon-logo-192.png",
           "priceRange": "₪1,800",
           "currenciesAccepted": "ILS",
+          "address": { "@type": "PostalAddress", "addressCountry": "IL" },
           "areaServed": { "@type": "Country", "name": "ישראל" },
           "knowsLanguage": "he",
           "sameAs": ["https://wa.me/972585308645"],
@@ -88,10 +89,15 @@
           },
           "founder": {
             "@type": "Person",
+            "@id": "https://ahia-cars.co.il/#ahia",
             "name": "אחיה אילון",
-            "jobTitle": "יועץ ומלווה לרכישת רכב",
+            "jobTitle": "יועץ רכב אישי — ליווי לקניית רכב יד 2",
+            "url": "https://ahia-cars.co.il/",
+            "image": "https://ahia-cars.co.il/assets/ahia-aylon-portrait.webp",
             "telephone": "+972-58-530-8645",
-            "email": "ahiaaylon.car@gmail.com"
+            "email": "ahiaaylon.car@gmail.com",
+            "worksFor": { "@id": "https://ahia-cars.co.il/#business" },
+            "knowsAbout": ["קניית רכב יד 2", "בדיקת רכב לפני קנייה", "משא ומתן על מחיר רכב"]
           }
         },
         {
@@ -819,18 +825,20 @@
       </div>
     </footer>
 
-    <a
-      class="whatsapp-float"
-      href="https://wa.me/972585308645?text=%D7%94%D7%99%D7%99%20%D7%90%D7%97%D7%99%D7%94%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A2%D7%9C%20%D7%9C%D7%99%D7%95%D7%95%D7%99%20%D7%9C%D7%A8%D7%9B%D7%99%D7%A9%D7%AA%20%D7%A8%D7%9B%D7%91."
-      target="_blank"
-      rel="noopener"
-      aria-label="שליחת הודעה לאחיה בוואטסאפ"
-    >
-      <span class="whatsapp-label" aria-hidden="true"><small>יש שאלה?</small><strong>דברו איתי בוואטסאפ</strong></span>
-      <span class="whatsapp-icon" aria-hidden="true">
-        <svg viewBox="0 0 32 32"><path d="M27.3 4.7A15.8 15.8 0 0 0 2.4 23.8L.2 32l8.4-2.2A15.8 15.8 0 0 0 27.3 4.7Zm-11.2 24a13 13 0 0 1-6.6-1.8l-.5-.3-5 1.3 1.3-4.9-.3-.5a13 13 0 1 1 11.1 6.2Zm7.1-9.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.3-.5.3-.9.1-2.3-1.1-3.8-2-5.3-4.6-.4-.7.4-.7 1.1-2.2.1-.3.1-.5 0-.7l-1.2-2.9c-.3-.8-.7-.7-.9-.7h-.8c-.3 0-.7.1-1.1.5-.4.4-1.4 1.4-1.4 3.4s1.5 4 1.7 4.2c.2.3 2.9 4.4 7 6.2 2.6 1.1 3.6 1.2 4.9 1 .8-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.2-.1-.5-.3-.9-.5Z"/></svg>
-      </span>
-    </a>
+    <aside aria-label="יצירת קשר מהירה">
+      <a
+        class="whatsapp-float"
+        href="https://wa.me/972585308645?text=%D7%94%D7%99%D7%99%20%D7%90%D7%97%D7%99%D7%94%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%93%D7%A8%D7%9A%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A2%D7%9C%20%D7%9C%D7%99%D7%95%D7%95%D7%99%20%D7%9C%D7%A8%D7%9B%D7%99%D7%A9%D7%AA%20%D7%A8%D7%9B%D7%91."
+        target="_blank"
+        rel="noopener"
+        aria-label="שליחת הודעה לאחיה בוואטסאפ"
+      >
+        <span class="whatsapp-label" aria-hidden="true"><small>יש שאלה?</small><strong>דברו איתי בוואטסאפ</strong></span>
+        <span class="whatsapp-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M27.3 4.7A15.8 15.8 0 0 0 2.4 23.8L.2 32l8.4-2.2A15.8 15.8 0 0 0 27.3 4.7Zm-11.2 24a13 13 0 0 1-6.6-1.8l-.5-.3-5 1.3 1.3-4.9-.3-.5a13 13 0 1 1 11.1 6.2Zm7.1-9.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.3-.5.3-.9.1-2.3-1.1-3.8-2-5.3-4.6-.4-.7.4-.7 1.1-2.2.1-.3.1-.5 0-.7l-1.2-2.9c-.3-.8-.7-.7-.9-.7h-.8c-.3 0-.7.1-1.1.5-.4.4-1.4 1.4-1.4 3.4s1.5 4 1.7 4.2c.2.3 2.9 4.4 7 6.2 2.6 1.1 3.6 1.2 4.9 1 .8-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.2-.1-.5-.3-.9-.5Z"/></svg>
+        </span>
+      </a>
+    </aside>
 
     <div class="success-modal" id="success-modal" hidden aria-hidden="true">
       <div class="success-confetti" aria-hidden="true"></div>
